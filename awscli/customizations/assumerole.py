@@ -3,6 +3,7 @@ import time
 import json
 import logging
 import getpass
+import onetimepass as otp
 
 from dateutil.parser import parse
 from datetime import datetime
@@ -248,6 +249,7 @@ class AssumeRoleProvider(credentials.CredentialProvider):
             source_profile = profiles[self._profile_name]['source_profile']
             role_arn = profiles[self._profile_name]['role_arn']
             mfa_serial = profiles[self._profile_name].get('mfa_serial')
+            mfa_id = profiles[self._profile_name].get('mfa_id')
         except KeyError as e:
             raise PartialCredentialsError(provider=self.METHOD,
                                           cred_var=str(e))
@@ -263,6 +265,7 @@ class AssumeRoleProvider(credentials.CredentialProvider):
             'external_id': external_id,
             'source_profile': source_profile,
             'mfa_serial': mfa_serial,
+            'mfa_id': mfa_id,
             'source_cred_values': source_cred_values,
         }
 
@@ -312,7 +315,13 @@ class AssumeRoleProvider(credentials.CredentialProvider):
         if config['external_id'] is not None:
             assume_role_kwargs['ExternalId'] = config['external_id']
         if config['mfa_serial'] is not None:
-            token_code = self._prompter("Enter MFA code: ")
+            if config['mfa_id'] is not None:
+                try:
+                    token_code = otp.get_totp(config['mfa_id'])
+                except:
+                    token_code = self._prompter("Enter MFA code: ")
+            else:
+                token_code = self._prompter("Enter MFA code: ")
             assume_role_kwargs['SerialNumber'] = config['mfa_serial']
             assume_role_kwargs['TokenCode'] = token_code
         return assume_role_kwargs
