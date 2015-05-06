@@ -317,7 +317,7 @@ class AssumeRoleProvider(credentials.CredentialProvider):
         if config['mfa_serial'] is not None:
             if config['mfa_id'] is not None:
                 try:
-                    token_code = otp.get_totp(config['mfa_id'])
+                    token_code = str(otp.get_totp(config['mfa_id']))
                 except:
                     token_code = self._prompter("Enter MFA code: ")
             else:
