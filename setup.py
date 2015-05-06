@@ -10,7 +10,8 @@ requires = ['botocore>=0.106.0,<0.107.0',
             'bcdoc>=0.14.0,<0.15.0',
             'colorama>=0.2.5,<=0.3.3',
             'docutils>=0.10',
-            'rsa>=3.1.2,<=3.1.4']
+            'rsa>=3.1.2,<=3.1.4',
+            'onetimepass>=0.2.1']
 
 if sys.version_info[:2] == (2, 6):
     # For python2.6 we have to require argparse since it
